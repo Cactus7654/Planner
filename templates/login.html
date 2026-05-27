@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Страница входа{% endblock %}
+{% block content %}
+<h1>Авторизация</h1>
+<form action="/login" method="POST">
+    <input name="username">
+    <input name="password">
+    <button type="submit">Войти</button>
+    </form>
+{% endblock %}
