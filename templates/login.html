@@ -7,4 +7,6 @@
     <input name="password">
     <button type="submit">Войти</button>
     </form>
-{% endblock %}
+{% if error %}
+    <p style="color: red;">{{ error }}</p>
+{% endif %}{% endblock %}

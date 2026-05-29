@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from datetime import date, datetime
 app = Flask(__name__)
+
+
+pseudo_bd = {'admin':'123'}
 
 
 @app.route('/')
@@ -17,7 +20,10 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        print(username, password)
+        if pseudo_bd.get(username) == password:
+            return redirect(url_for('index'))
+        else:
+            return render_template('login.html', error='Неверный логин или пароль')
     return render_template('login.html')
 
 if __name__ == '__main__':

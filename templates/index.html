@@ -1,4 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Дата: {{today}}</h1>
+<form method="post" action = '/login'>
+    <button>Перейти к авторизации</button>
+</form>
 {% endblock %}
