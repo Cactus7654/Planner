@@ -1,15 +1,19 @@
 import sqlite3
+from datetime import date
 
 DATABASE = 'planner.db'
+
+
 def get_db():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
 
+
 def init_db():
     with get_db() as conn:
         conn.execute(
-        '''
+            '''
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
@@ -30,7 +34,10 @@ def init_db():
             
         
         ''')
+
+
 init_db()
+
 
 def register_user(username, password):
     try:
@@ -50,3 +57,16 @@ def check_user(username, password):
             'SELECT * FROM users WHERE username = ? AND password = ?',
             (username, password)
         ).fetchone()
+
+
+def add_habit(user_id, description):
+    today = date.today()
+    try:
+        with get_db() as conn:
+            conn.execute('''
+            insert into habits (user_id, description, date) values(?, ?, ?) 
+            ''', (user_id, description, today))
+            return True
+    except sqlite3.IntegrityError:
+        return False
+

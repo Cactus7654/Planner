@@ -2,4 +2,14 @@
 {% block title %}Страница регистрации{% endblock %}
 {% block content %}
 <h1>Регистрация</h1>
+<form action="/register" method="post" >
+    <label for="un"> Имя пользователя</label>
+    <input name="username" id="un">
+    <label for="pa"> Пароль</label>
+    <input name="password" id='pa'>
+    <button type="submit">Зарегистрироваться</button>
+    {% if error %}
+    <p>{{error}}</p>
+    {% endif %}
+</form>
 {% endblock %}

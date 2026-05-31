@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Дата: {{today}}</h1>
-<form method="post" action = '/login'>
+{% if not name %}
+<form method="GET" action = '/login'>
     <button>Перейти к авторизации</button>
+</form>
+{% endif %}
+<p>Привет, {{name}}</p>
+<form method="POST" action="/add_habit">
+    <p>Ввести привычку</p>
+    <input name = "descript">
 </form>
 {% endblock %}
