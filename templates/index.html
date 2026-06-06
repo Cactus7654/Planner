@@ -7,8 +7,56 @@
 </form>
 {% endif %}
 <p>Привет, {{name}}</p>
-<form method="POST" action="/add_habit">
-    <p>Ввести привычку</p>
-    <input name = "descript">
+<form method="POST" action="/add_habit" class="row g-3 mb-4">
+    <div class="col-6">
+        <div class="input-group">
+            <input name="description" class="form-control" placeholder="Ввести привычку">
+            <button type="submit" class="btn btn-success">Добавить</button>
+        </div>
+        <br/>
+            <input name="regularity" class="form-control" placeholder="Ввести регулярность">
+            <button type="submit" class="btn btn-success">Добавить</button>
+        </div>
+    </div>
+
 </form>
+{%if error%}
+<p>Ошибка: {{error}}</p>
+{% endif %}
+
+
+<ul class="list-group">
+    {% for habit in today_habits %}
+        <li class="list-group-item d-flex justify-content-start gap-3 align-items-center">
+            <div class="col-3">
+                <span>{{habit.description}}, {{habit.regularity}}</span>
+            </div>
+
+            <div>
+                <form method="POST" action="/add_completion" class="mb-2">
+                    <input type="hidden" name="description" value="{{habit.description}}">
+                    <input type="hidden" name="done_status" value="1">
+
+                    <button type="button" onclick="this.nextElementSibling.hidden = !this.nextElementSibling.hidden">
+                        Выполнено
+                    </button>
+                    <div hidden>
+                        <button>Сейчас</button>
+                        <input type="datetime-local" name="date_requested">
+                        <button type="submit" class="btn btn-sm btn-outline-success">
+                            Подтвердить дату
+                        </button>
+                    </div>
+                </form>
+
+
+                <form method="POST" action="/add_completion">
+                    <input type="hidden" name="description" value="{{habit.description}}">
+                    <input type="hidden" name="cancel" value="1">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Отменить последнее выполнение</button>
+                </form>
+            </div>
+        </li>
+    {% endfor %}
+</ul>
 {% endblock %}
