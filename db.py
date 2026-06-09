@@ -1,5 +1,4 @@
 import sqlite3
-from datetime import date
 from typing import Tuple, Optional
 
 DATABASE = 'planner.db'
@@ -27,7 +26,7 @@ def init_db():
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id     INTEGER NOT NULL,
             description TEXT    NOT NULL,
-            regularity TEXT NOT NULL,
+            regularity REAL NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
             UNIQUE (user_id, description)
         );        
@@ -103,10 +102,38 @@ def cancel_completion(user_id, description, date_str):
         if hab:
             conn.execute('''
             DELETE FROM completions
-            WHERE id = ? and completed_at = ?
+            WHERE habit_id = ? and completed_at = ?
             ''', (hab['id'], date_str))
+            conn.commit()
             return True
     return False
+
+
+def delete_habit(user_id, id):
+    with get_db() as conn:
+       conn.execute('''
+       DELETE FROM habits
+       WHERE user_id = ?
+       AND id = ?
+       ''', (user_id, id))
+       conn.commit()
+       return True
+    return False
+
+
+def change_habit(new_regularity, new_description, user_id, id):
+    with get_db() as conn:
+       conn.execute('''
+       UPDATE habits
+       SET regularity = ?, description = ?
+       WHERE user_id = ?
+       AND id = ?
+       ''', (new_regularity, new_description, user_id, id))
+       conn.commit()
+       return True
+    return False
+
+
 
 # отладочная
 def get_last_execution_date(user_id, description):
@@ -115,18 +142,20 @@ def get_last_execution_date(user_id, description):
                 SELECT id FROM habits WHERE user_id = ? AND description = ?''',
                      (user_id, description)).fetchone()
         if hab:
-            return conn.execute('''
+            result =  conn.execute('''
             SELECT completed_at
             FROM completions
-            WHERE id = ?
-            ORDER BY DESC
+            WHERE habit_id = ?
+            ORDER BY completed_at DESC
             LIMIT 1
             ''', (hab['id'],)).fetchone()
-    return False
+            if result:
+                return result['completed_at']
+    return None
 
 #----------------геттеры------------------
 
-def get_habits(user_id):
+def get_all_habits(user_id):
     try:
         with get_db() as conn:
             return conn.execute('''
@@ -135,6 +164,23 @@ def get_habits(user_id):
             LEFT JOIN completions c1
                 ON h1.id = c1.habit_id
             where h1.user_id = ?
+            ''', (user_id,)).fetchall()
+    except sqlite3.Error as e:
+        print(f'Ошибка при работе с бд:{e}')
+        return False
+
+
+def get_habits_for_dashboard(user_id):
+    try:
+        with get_db() as conn:
+            return conn.execute('''
+            select h1.id, description, regularity, MAX(completed_at) as completed_at
+            from habits h1
+            LEFT JOIN completions c1
+                ON h1.id = c1.habit_id
+            where h1.user_id = ?
+            GROUP BY h1.id
+
             ''', (user_id,)).fetchall()
     except sqlite3.Error as e:
         print(f'Ошибка при работе с бд:{e}')

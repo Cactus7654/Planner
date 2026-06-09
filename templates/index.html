@@ -1,52 +1,105 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Дата: {{today}}</h1>
+
+
+
+{% if session.get('play_sound') %}
+    <script>new Audio('/static/{{ session.pop('play_sound') }}.mp3').play();</script>
+{% endif %}
+
+
+
 {% if not name %}
 <form method="GET" action = '/login'>
     <button>Перейти к авторизации</button>
 </form>
 {% endif %}
-<p>Привет, {{name}}</p>
-<form method="POST" action="/add_habit" class="row g-3 mb-4">
+<br/><br/><br/>
+
+<form method="POST" action="/add_habit" class="row g-3 mb-2">
     <div class="col-6">
         <div class="input-group">
-            <input name="description" class="form-control" placeholder="Ввести привычку">
-            <button type="submit" class="btn btn-success">Добавить</button>
+            <input name="description" class="form-control mb-2" placeholder="Привычка">
         </div>
-        <br/>
-            <input name="regularity" class="form-control" placeholder="Ввести регулярность">
-            <button type="submit" class="btn btn-success">Добавить</button>
+        <div>
+            <label class="mb-2">Повторять каждые</label>
+                <div class="input-group mb-2">
+                    <input name="reg_days" class="form-control" placeholder="Дни" type="number" min="0" value="0">
+                    <span class="input-group-text">дней</span>
+                    <input name="reg_hours" class="form-control" placeholder="Часы" type="number" min="0" value="0">
+                    <span class="input-group-text">часов</span>
+                    <input name="reg_minutes" class="form-control" placeholder="Минуты" type="number" min="0" value="0">
+                    <span class="input-group-text">минут</span>
+                    <button type="submit" class="btn btn-success">Добавить</button>
+                </div>
         </div>
-    </div>
 
+    </div>
+    <div class="col-6">
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.querySelector('.habit-list').classList.toggle('show_actions')">Режим редактирования</button>
+    </div>
 </form>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="col-6">
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} d-flex justify-content-between align-items-center" role="alert">
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
 {%if error%}
 <p>Ошибка: {{error}}</p>
 {% endif %}
 
 
-<ul class="list-group">
+<ul class="list-group habit-list">
     {% for habit in today_habits %}
-        <li class="list-group-item d-flex justify-content-start gap-3 align-items-center">
-            <div class="col-3">
-                <span>{{habit.description}}, {{habit.regularity}}</span>
+        <li class="list-group-item d-flex justify-content-start gap-2 align-items-center">
+            <div class="col-5">
+                <span>
+                    <strong>{{ habit.description }}</strong><br>
+                    Каждые: {{habit.formatted_regularity}} <br>
+                    Срочность: {{habit.urgency}}</span>
             </div>
+
+           <div class="hide_actions">
+               <form method="POST" action="/delete_habit" >
+                   <input type="hidden" name = delete_habit_id value="{{habit.id}}">
+                   <button type="submit" class="btn btn-sm btn-danger">Удалить привычку</button>
+               </form>
+               <form method="POST" action="/change_habit" >
+                   <input type="hidden" name="id" value="{{habit.id}}">
+                   <input name="new_description" class="form-control" placeholder="Описание" type="text" value="{{habit.description}}">
+                   <input name="new_regularity" class="form-control" placeholder="Регулярность" value="{{habit.regularity}}">
+                   <button type="submit" class="btn btn-sm btn-warning">Подтвердить новые данные</button>
+
+               </form>
+
+           </div>
 
             <div>
                 <form method="POST" action="/add_completion" class="mb-2">
                     <input type="hidden" name="description" value="{{habit.description}}">
                     <input type="hidden" name="done_status" value="1">
 
-                    <button type="button" onclick="this.nextElementSibling.hidden = !this.nextElementSibling.hidden">
+                    <button type="button" class="btn btn-sm btn-outline-success" onclick="this.hidden = true; this.nextElementSibling.hidden = false">
                         Выполнено
                     </button>
+
                     <div hidden>
-                        <button>Сейчас</button>
-                        <input type="datetime-local" name="date_requested">
+                        <button type="submit" class="btn btn-sm btn-outline-success">Сейчас</button>
+                        <input type="datetime-local" class="btn btn-sm btn-outline-success" name="date_requested">
                         <button type="submit" class="btn btn-sm btn-outline-success">
                             Подтвердить дату
                         </button>
                     </div>
+
                 </form>
 
 
@@ -60,3 +113,4 @@
     {% endfor %}
 </ul>
 {% endblock %}
+

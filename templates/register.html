@@ -2,14 +2,17 @@
 {% block title %}Страница регистрации{% endblock %}
 {% block content %}
 <h1>Регистрация</h1>
-<form action="/register" method="post" >
-    <label for="un"> Имя пользователя</label>
-    <input name="username" id="un">
-    <label for="pa"> Пароль</label>
-    <input name="password" id='pa'>
-    <button type="submit">Зарегистрироваться</button>
-    {% if error %}
-    <p>{{error}}</p>
-    {% endif %}
-</form>
+<div>
+    <form action="/register" method="post" class="col-4">
+        <label for="un"> Имя пользователя</label>
+        <input name="username" id="un" class="form-control">
+        <label for="pa"> Пароль</label>
+        <input type="password" name="password" id='pa' class="form-control mb-2" >
+        <button type="submit" class="btn btn-success w-100">Зарегистрироваться</button>
+        {% if error %}
+        <div class="alert alert-danger mt-2">{{ error }}</div>
+        {% endif %}
+    </form>
+    <a href="/login"> Есть аккаунт </a>
+</div>
 {% endblock %}
