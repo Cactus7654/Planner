@@ -50,6 +50,7 @@ def register():
             return redirect(url_for('login'))
         else:
             return render_template('register.html', error='Пользователь с таким именем уже существует')
+    return render_template('register.html')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':

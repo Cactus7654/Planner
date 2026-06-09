@@ -16,7 +16,7 @@
 {% endif %}
 <br/><br/><br/>
 
-<form method="POST" action="/add_habit" class="row g-3 mb-2">
+<form method="POST" action="/add_habit" class="row g-3 mb-2" autocomplete="off">
     <div class="col-6">
         <div class="input-group">
             <input name="description" class="form-control mb-2" placeholder="Привычка">
@@ -73,7 +73,7 @@
                    <input type="hidden" name = delete_habit_id value="{{habit.id}}">
                    <button type="submit" class="btn btn-sm btn-danger">Удалить привычку</button>
                </form>
-               <form method="POST" action="/change_habit" >
+               <form method="POST" action="/change_habit" autocomplete="off">
                    <input type="hidden" name="id" value="{{habit.id}}">
                    <input name="new_description" class="form-control" placeholder="Описание" type="text" value="{{habit.description}}">
                    <input name="new_regularity" class="form-control" placeholder="Регулярность" value="{{habit.regularity}}">
