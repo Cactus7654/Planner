@@ -4,8 +4,6 @@ import db
 app = Flask(__name__)
 app.secret_key = 'parol132'
 
-
-
 @app.route('/')
 def index():
     if 'user_id' not in session:
@@ -85,7 +83,12 @@ def add_habit():
     if des:
         session['play_sound'] = 'hueta'
         db.add_habit(session['user_id'], des, date_req_minutes)
-        flash(f'Привычка "{des}" добавлена', 'success')
+        flash(f'Привычка {des} добавлена', 'success')
+
+        name = 'alex'
+        age = 22
+        print(f'sdafsdf sdf sdf sdf{age} sdf sdf{name} sdf ')
+
         return redirect(url_for('index'))
     else:
         flash('Введите название привычки', 'error')
@@ -97,13 +100,18 @@ def add_completion():
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     des = request.form.get('description')
     date_req = request.form.get("date_requested")
-    if request.form.get('cancel') == '1':
-        db.cancel_completion(us, des, db.get_last_execution_date(us, des))
-    elif date_req.strip():
+    if date_req.strip():
         date_req = date_req.replace('T', ' ') + ':00'
         db.add_completion(us, des, date_req)
     else:
         db.add_completion(us, des, now)
+    return redirect(url_for('index'))
+
+@app.route('/delete_completion', methods = ["POST"])
+def delete_completion():
+    if request.form.get('cancel') == '1':
+        db.cancel_completion(session['user_id'], request.form.get('description'),
+                             db.get_last_execution_date(session['user_id'], request.form.get('description')))
     return redirect(url_for('index'))
 
 
